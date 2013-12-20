@@ -16,6 +16,9 @@ module Build
 
     # Create a lock and yield, other threads waiting for the same lock
     # will return when the lock is done without doing any work
+    #
+    # Only the first thread will get the result of the block returned,
+    # threads that just waited for the result get nil
     def lock_once(lock_name, options = {})
       mutex = build_mutex(lock_name, options)
 
@@ -27,6 +30,7 @@ module Build
           # Another threat is already synchronizing, let's just lock and
           # wait until it's done
           mutex.lock
+          nil
         end
       ensure
         mutex.unlock
